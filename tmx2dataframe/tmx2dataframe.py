@@ -10,6 +10,15 @@ def process_tuv(tuv):
     txt = seg.childNodes[0].data
     return lang, txt
 
+
+def extract_note(tu):
+    notes = tu.getElementsByTagName('note')
+    if len(notes) >= 1:
+        # if there's more than one note, only the first one will be extracted
+        # if all notes are to be extracted, they could be concatenated in the same value
+        return notes[0].childNodes[0].data
+
+
 def read(path):
 
     """Read function takes in a path to TMX translation file and outputs the metadata and a pandas dataframe.
@@ -51,6 +60,11 @@ def read(path):
                 'target_language': targetlang,
                 'target_sentence': targetsentence
             }
+
+            note = extract_note(tu)
+            if note:
+                item['note'] = note
+
             items.append(item)
 
     df = pd.DataFrame(items)
