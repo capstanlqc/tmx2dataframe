@@ -47,18 +47,34 @@ def read(path):
     translation_units = body.getElementsByTagName('tu')
     items = []
     count_unpaired = 0
+    position = 0
     for tu in translation_units:
+        position += 1
         if len(tu.getElementsByTagName('tuv')) < 2:
             print("Unpaired translation. Ignoring...")
             count_unpaired = count_unpaired + 1
         else:
+            file_value = None
+            id_value = None
+            if len(tu.getElementsByTagName("prop")) > 0:
+                props = tu.getElementsByTagName('prop')
+
+                for prop in props:
+                    if prop.getAttribute('type') == 'file':
+                        file_value = prop.firstChild.nodeValue
+                    elif prop.getAttribute('type') == 'id':
+                        id_value = prop.firstChild.nodeValue
+
             srclang, srcsentence = process_tuv(tu.getElementsByTagName('tuv')[0])
             targetlang, targetsentence = process_tuv(tu.getElementsByTagName('tuv')[1])
             item = {
-                'source_language': srclang,
-                'source_sentence': srcsentence,
-                'target_language': targetlang,
-                'target_sentence': targetsentence
+                "file": file_value,
+                "id": id_value,
+                "source_language": srclang,
+                "source_sentence": srcsentence,
+                "target_language": targetlang,
+                "target_sentence": targetsentence,
+                "position": position
             }
 
             note = extract_note(tu)
